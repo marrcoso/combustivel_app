@@ -65,3 +65,42 @@ Abaixo a estrutura oficial das coleções e documentos no Cloud Firestore:
 O aplicativo possuirá filtros ativos na Lista e no Mapa:
 *   Busca pelo **Nome do Posto**.
 *   Filtro por **Tipo do Combustível** (exibindo e ordenando os postos de acordo com o combustível selecionado).
+
+## 7. Fases de Desenvolvimento
+
+O projeto será implementado seguindo a divisão de tarefas abaixo:
+
+### Fase 1: Setup e Autenticação
+*   Configuração inicial do projeto Flutter.
+*   Integração do Firebase (CLI e FlutterFire).
+*   Configuração do Firebase Authentication (E-mail/Senha).
+*   Criação de serviço de gerência de estado para sessão.
+*   Desenvolvimento das telas de Login e Cadastro.
+*   Criação do documento na coleção `users` no Firestore após o cadastro.
+
+### Fase 2: Estrutura Base e Mapa
+*   Instalação de pacotes para mapas e localização (`flutter_map`, `latlong2`, `geolocator`).
+*   Solicitação de permissão de GPS em foreground.
+*   Desenvolvimento da View Principal e renderização do `flutter_map` (OpenStreetMap).
+*   Tratamento de falta de conexão com a internet.
+*   Lógica de exibição condicional de UI baseada na flag `isAdmin`.
+
+### Fase 3: Postos e Preços (Admin)
+*   Criação de Tela/Modal para o Admin cadastrar um novo Posto.
+*   Lógica de persistência na coleção `stations` do Firestore.
+*   Inclusão de assets (imagens locais) das bandeiras.
+*   Busca da coleção `stations` e renderização dos pinos no mapa.
+*   Desenvolvimento da Tela de Detalhes do Posto com lista de preços.
+*   Modal/Tela de "Editar Preços" restrita aos Administradores.
+
+### Fase 4: Lista, Filtros e Roteamento
+*   Desenvolvimento da Tela de Lista de Postos (cards).
+*   Ordenação da lista pela distância calculada via GPS.
+*   Implementação dos Filtros (Por Nome, Por Combustível) para Lista e Mapa.
+*   Integração com abertura de links nativos para roteamento (Waze/Google Maps).
+
+### Fase 5: Crowdsourcing (Sugestões de Preço)
+*   Criação do botão "Sugerir Preço" na tela de detalhes (para Usuários Comuns).
+*   Formulário de Sugestão e gravação na coleção `price_suggestions` (status `pending`).
+*   Criação da tela de "Aprovações Pendentes" para Administradores.
+*   Fluxo de aprovação (atualiza posto e status da sugestão) ou recusa.
