@@ -1,31 +1,43 @@
-import 'package:combustivel_ap/cubit/app_cubit.dart';
-import 'package:combustivel_ap/pages/login_page.dart';
-import 'package:combustivel_ap/pages/register_page.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:firebase_core/firebase_core.dart';
+import 'firebase_options.dart';
 
-void main() {
+import 'features/auth/bloc/auth_bloc.dart';
+import 'features/auth/repositories/auth_repository.dart';
+import 'features/auth/ui/screens/login_screen.dart';
+
+void main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+  await Firebase.initializeApp(
+    options: DefaultFirebaseOptions.currentPlatform,
+  );
+
   runApp(
-    BlocProvider(
-      create: (context) => AppCubit(),
-      child: MainApp()
-    )
+    RepositoryProvider(
+      create: (context) => AuthRepository(),
+      child: BlocProvider(
+        create: (context) => AuthBloc(
+          authRepository: RepositoryProvider.of<AuthRepository>(context),
+        ),
+        child: const MainApp(),
+      ),
+    ),
   );
 }
 
 class MainApp extends StatelessWidget {
-  MainApp({super.key});
-
-  final Map<String, WidgetBuilder> routes = {
-    "/register": (context) => const RegisterPage(),
-    "/login": (context) => const LoginPage(),
-  };
+  const MainApp({super.key});
 
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      routes: routes,
-      initialRoute: "/register",
+      title: 'Combustível App',
+      theme: ThemeData(
+        colorScheme: ColorScheme.fromSeed(seedColor: Colors.blue),
+        useMaterial3: true,
+      ),
+      home: const LoginScreen(),
     );
   }
 }
