@@ -6,6 +6,8 @@ import 'firebase_options.dart';
 import 'features/auth/cubit/auth_cubit.dart';
 import 'features/auth/repositories/auth_repository.dart';
 import 'features/auth/ui/screens/login_screen.dart';
+import 'features/stations/repositories/station_repository.dart';
+import 'features/stations/cubit/station_cubit.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -14,12 +16,24 @@ void main() async {
   );
 
   runApp(
-    RepositoryProvider(
-      create: (context) => AuthRepository(),
-      child: BlocProvider(
-        create: (context) => AuthCubit(
-          authRepository: RepositoryProvider.of<AuthRepository>(context),
-        ),
+    MultiRepositoryProvider(
+      providers: [
+        RepositoryProvider(create: (context) => AuthRepository()),
+        RepositoryProvider(create: (context) => StationRepository()),
+      ],
+      child: MultiBlocProvider(
+        providers: [
+          BlocProvider(
+            create: (context) => AuthCubit(
+              authRepository: RepositoryProvider.of<AuthRepository>(context),
+            ),
+          ),
+          BlocProvider(
+            create: (context) => StationCubit(
+              stationRepository: RepositoryProvider.of<StationRepository>(context),
+            ),
+          ),
+        ],
         child: const MainApp(),
       ),
     ),

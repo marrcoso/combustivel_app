@@ -8,6 +8,8 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import '../../../auth/cubit/auth_cubit.dart';
 import '../../../auth/cubit/auth_state.dart';
 import '../../../stations/ui/widgets/add_station_bottom_sheet.dart';
+import '../../../stations/cubit/station_cubit.dart';
+import '../../../stations/cubit/station_state.dart';
 import '../../../profile/ui/screens/profile_screen.dart';
 
 class HomeScreen extends StatefulWidget {
@@ -149,6 +151,88 @@ class _HomeScreenState extends State<HomeScreen> {
                 ),
               ],
             ),
+          BlocBuilder<StationCubit, StationState>(
+            builder: (context, state) {
+              if (state is StationLoaded) {
+                return MarkerLayer(
+                  markers: state.stations.map((station) {
+                    return Marker(
+                      point: LatLng(station.latitude, station.longitude),
+                      width: 40,
+                      height: 40,
+                      child: GestureDetector(
+                        onTap: () {
+                          showModalBottomSheet(
+                            context: context,
+                            shape: const RoundedRectangleBorder(
+                              borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+                            ),
+                            builder: (context) => Padding(
+                              padding: const EdgeInsets.all(24.0),
+                              child: Column(
+                                mainAxisSize: MainAxisSize.min,
+                                crossAxisAlignment: CrossAxisAlignment.stretch,
+                                children: [
+                                  Row(
+                                    children: [
+                                      const Icon(Icons.local_gas_station, size: 40, color: Colors.blue),
+                                      const SizedBox(width: 16),
+                                      Expanded(
+                                        child: Column(
+                                          crossAxisAlignment: CrossAxisAlignment.start,
+                                          children: [
+                                            Text(
+                                              station.name,
+                                              style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+                                            ),
+                                            Text(
+                                              station.brand.isNotEmpty ? station.brand : 'Sem Bandeira',
+                                              style: const TextStyle(fontSize: 16, color: Colors.grey),
+                                            ),
+                                          ],
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                  const SizedBox(height: 16),
+                                  Row(
+                                    crossAxisAlignment: CrossAxisAlignment.start,
+                                    children: [
+                                      const Icon(Icons.location_on, color: Colors.grey, size: 20),
+                                      const SizedBox(width: 8),
+                                      Expanded(
+                                        child: Text(
+                                          station.address,
+                                          style: const TextStyle(fontSize: 14),
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                  const SizedBox(height: 24),
+                                  ElevatedButton(
+                                    onPressed: () {
+                                      Navigator.pop(context); // TODO: Navegar para detalhes
+                                    },
+                                    child: const Text('Ver Detalhes e Preços'),
+                                  ),
+                                ],
+                              ),
+                            ),
+                          );
+                        },
+                        child: const Icon(
+                          Icons.local_gas_station,
+                          color: Colors.red,
+                          size: 40,
+                        ),
+                      ),
+                    );
+                  }).toList(),
+                );
+              }
+              return const SizedBox.shrink();
+            },
+          ),
         ],
       ),
       floatingActionButton: FloatingActionButton(
