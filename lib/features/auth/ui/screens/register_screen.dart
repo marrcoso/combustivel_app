@@ -1,8 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import '../../bloc/auth_bloc.dart';
-import '../../bloc/auth_event.dart';
-import '../../bloc/auth_state.dart';
+import '../../cubit/auth_cubit.dart';
+import '../../cubit/auth_state.dart';
 
 class RegisterScreen extends StatefulWidget {
   const RegisterScreen({super.key});
@@ -33,8 +32,9 @@ class _RegisterScreenState extends State<RegisterScreen> {
     }
 
     if (_emailController.text.isNotEmpty && _passwordController.text.isNotEmpty) {
-      BlocProvider.of<AuthBloc>(context).add(
-        SignUpRequested(_emailController.text, _passwordController.text),
+      BlocProvider.of<AuthCubit>(context).signUp(
+        email: _emailController.text,
+        password: _passwordController.text,
       );
     } else {
       ScaffoldMessenger.of(context).showSnackBar(
@@ -47,7 +47,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(title: const Text('Criar Conta')),
-      body: BlocListener<AuthBloc, AuthState>(
+      body: BlocListener<AuthCubit, AuthState>(
         listener: (context, state) {
           if (state is Authenticated) {
             Navigator.pop(context);
@@ -61,7 +61,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
             );
           }
         },
-        child: BlocBuilder<AuthBloc, AuthState>(
+        child: BlocBuilder<AuthCubit, AuthState>(
           builder: (context, state) {
             if (state is AuthLoading) {
               return const Center(child: CircularProgressIndicator());

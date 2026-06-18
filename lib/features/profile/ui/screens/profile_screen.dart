@@ -1,8 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import '../../../auth/bloc/auth_bloc.dart';
-import '../../../auth/bloc/auth_event.dart';
-import '../../../auth/bloc/auth_state.dart';
+import '../../../auth/cubit/auth_cubit.dart';
+import '../../../auth/cubit/auth_state.dart';
 import '../../../auth/ui/screens/login_screen.dart';
 
 class ProfileScreen extends StatelessWidget {
@@ -17,12 +16,12 @@ class ProfileScreen extends StatelessWidget {
           IconButton(
             icon: const Icon(Icons.logout),
             onPressed: () {
-              context.read<AuthBloc>().add(SignOutRequested());
+              context.read<AuthCubit>().signOut();
             },
           )
         ],
       ),
-      body: BlocListener<AuthBloc, AuthState>(
+      body: BlocListener<AuthCubit, AuthState>(
         listener: (context, state) {
           if (state is Unauthenticated) {
             // Retorna para a tela de Login removendo tudo do histórico
@@ -32,7 +31,7 @@ class ProfileScreen extends StatelessWidget {
             );
           }
         },
-        child: BlocBuilder<AuthBloc, AuthState>(
+        child: BlocBuilder<AuthCubit, AuthState>(
           builder: (context, state) {
             if (state is Authenticated) {
               return Center(

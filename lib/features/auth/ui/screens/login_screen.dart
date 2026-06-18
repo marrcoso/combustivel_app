@@ -1,9 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import '../../bloc/auth_bloc.dart';
-import '../../bloc/auth_event.dart';
-import '../../bloc/auth_state.dart';
-import '../../../profile/ui/screens/profile_screen.dart';
+import '../../cubit/auth_cubit.dart';
+import '../../cubit/auth_state.dart';
+import '../../../home/ui/screens/home_screen.dart';
 import 'register_screen.dart';
 
 class LoginScreen extends StatefulWidget {
@@ -26,8 +25,9 @@ class _LoginScreenState extends State<LoginScreen> {
 
   void _authenticateWithEmailAndPassword(context) {
     if (_emailController.text.isNotEmpty && _passwordController.text.isNotEmpty) {
-      BlocProvider.of<AuthBloc>(context).add(
-        SignInRequested(_emailController.text, _passwordController.text),
+      BlocProvider.of<AuthCubit>(context).signIn(
+        email: _emailController.text,
+        password: _passwordController.text,
       );
     } else {
       ScaffoldMessenger.of(context).showSnackBar(
@@ -39,12 +39,12 @@ class _LoginScreenState extends State<LoginScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: BlocListener<AuthBloc, AuthState>(
+      body: BlocListener<AuthCubit, AuthState>(
         listener: (context, state) {
           if (state is Authenticated) {
             Navigator.pushReplacement(
               context,
-              MaterialPageRoute(builder: (context) => const ProfileScreen()),
+              MaterialPageRoute(builder: (context) => const HomeScreen()),
             );
           }
           if (state is AuthError) {
@@ -53,7 +53,7 @@ class _LoginScreenState extends State<LoginScreen> {
             );
           }
         },
-        child: BlocBuilder<AuthBloc, AuthState>(
+        child: BlocBuilder<AuthCubit, AuthState>(
           builder: (context, state) {
             if (state is AuthLoading) {
               return const Center(child: CircularProgressIndicator());
