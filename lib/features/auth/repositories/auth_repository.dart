@@ -48,6 +48,16 @@ class AuthRepository {
     await _firebaseAuth.signOut();
   }
 
+  Future<UserModel?> checkSession() async {
+    final currentUser = _firebaseAuth.currentUser;
+    if (currentUser == null) return null;
+
+    final doc = await _firestore.collection('users').doc(currentUser.uid).get();
+    if (!doc.exists) return null;
+
+    return UserModel.fromMap(doc.data() ?? {}, currentUser.uid);
+  }
+
   String _handleAuthException(dynamic e) {
     if (e is FirebaseAuthException) {
       switch (e.code) {

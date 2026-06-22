@@ -6,6 +6,8 @@ import 'firebase_options.dart';
 import 'features/auth/cubit/auth_cubit.dart';
 import 'features/auth/repositories/auth_repository.dart';
 import 'features/auth/ui/screens/login_screen.dart';
+import 'features/auth/cubit/auth_state.dart';
+import 'features/home/ui/screens/home_screen.dart';
 import 'features/stations/repositories/station_repository.dart';
 import 'features/stations/cubit/station_cubit.dart';
 
@@ -26,7 +28,7 @@ void main() async {
           BlocProvider(
             create: (context) => AuthCubit(
               authRepository: RepositoryProvider.of<AuthRepository>(context),
-            ),
+            )..checkAuthStatus(),
           ),
           BlocProvider(
             create: (context) => StationCubit(
@@ -51,7 +53,15 @@ class MainApp extends StatelessWidget {
         colorScheme: ColorScheme.fromSeed(seedColor: Colors.blue),
         useMaterial3: true,
       ),
-      home: const LoginScreen(),
+      home: BlocBuilder<AuthCubit, AuthState>(
+        builder: (context, state) {
+          return switch (state) {
+            AuthInitial() || AuthLoading() => const Scaffold(body: Center(child: CircularProgressIndicator())),
+            Authenticated() => const HomeScreen(),
+            _ => const LoginScreen(),
+          };
+        },
+      ),
     );
   }
 }
