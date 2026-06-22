@@ -1,13 +1,17 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:url_launcher/url_launcher.dart';
+import 'package:latlong2/latlong.dart';
 
 import '../../models/station_model.dart';
+import '../../models/fuel_type.dart';
 import '../../cubit/station_cubit.dart';
 import '../../cubit/station_state.dart';
 import '../../../auth/cubit/auth_cubit.dart';
 import '../../../auth/cubit/auth_state.dart';
+import '../../../home/cubit/home_navigation_cubit.dart';
 import '../widgets/edit_prices_bottom_sheet.dart';
+import '../widgets/suggest_price_bottom_sheet.dart';
 
 class StationDetailsScreen extends StatelessWidget {
   final StationModel initialStation;
@@ -104,6 +108,21 @@ class StationDetailsScreen extends StatelessWidget {
                     textStyle: const TextStyle(fontSize: 18),
                   ),
                 ),
+                const SizedBox(height: 16),
+                ElevatedButton.icon(
+                  onPressed: () {
+                    context.read<HomeNavigationCubit>().showOnMap(LatLng(station.latitude, station.longitude), station.id);
+                    Navigator.pop(context);
+                  },
+                  icon: const Icon(Icons.map),
+                  label: const Text('Mostrar no Mapa'),
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: Colors.blueAccent,
+                    foregroundColor: Colors.white,
+                    padding: const EdgeInsets.symmetric(vertical: 12),
+                    textStyle: const TextStyle(fontSize: 18),
+                  ),
+                ),
                 const SizedBox(height: 32),
                 const Text(
                   'Preços',
@@ -114,28 +133,46 @@ class StationDetailsScreen extends StatelessWidget {
                   const Center(child: Text('Nenhum preço cadastrado.'))
                 else
                   ...station.prices.map((p) => Card(
-                    child: ListTile(
-                      title: Text(p.fuelType, style: const TextStyle(fontWeight: FontWeight.bold)),
-                      trailing: Text(
-                        'R\$ ${p.price.toStringAsFixed(2)}',
-                        style: const TextStyle(fontSize: 18, color: Colors.green, fontWeight: FontWeight.bold),
+                    child: InkWell(
+                      onTap: isAdmin ? null : () {
+                        final fuelType = FuelType.values.firstWhere(
+                          (t) => t.displayName == p.fuelType,
+                          orElse: () => FuelType.gasolinaComum,
+                        );
+                        showModalBottomSheet(
+                          context: context,
+                          isScrollControlled: true,
+                          builder: (context) => SuggestPriceBottomSheet(
+                            station: station,
+                            initialFuelType: fuelType,
+                          ),
+                        );
+                      },
+                      child: ListTile(
+                        title: Text(p.fuelType, style: const TextStyle(fontWeight: FontWeight.bold)),
+                        trailing: Text(
+                          'R\$ ${p.price.toStringAsFixed(2)}',
+                          style: const TextStyle(fontSize: 18, color: Colors.green, fontWeight: FontWeight.bold),
+                        ),
                       ),
                     ),
-                  )).toList(),
+                  )),
               ],
             ),
           ),
-          floatingActionButton: isAdmin ? FloatingActionButton.extended(
+          floatingActionButton: FloatingActionButton.extended(
             onPressed: () {
               showModalBottomSheet(
                 context: context,
                 isScrollControlled: true,
-                builder: (context) => EditPricesBottomSheet(station: station),
+                builder: (context) => isAdmin 
+                    ? EditPricesBottomSheet(station: station)
+                    : SuggestPriceBottomSheet(station: station),
               );
             },
-            icon: const Icon(Icons.edit),
-            label: const Text('Editar Preços'),
-          ) : null,
+            icon: Icon(isAdmin ? Icons.edit : Icons.lightbulb),
+            label: Text(isAdmin ? 'Editar Preços' : 'Sugerir Preço'),
+          ),
         );
       },
     );

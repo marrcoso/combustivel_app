@@ -9,6 +9,18 @@ class PriceModel {
     required this.updatedAt,
   });
 
+  PriceModel copyWith({
+    String? fuelType,
+    double? price,
+    DateTime? updatedAt,
+  }) {
+    return PriceModel(
+      fuelType: fuelType ?? this.fuelType,
+      price: price ?? this.price,
+      updatedAt: updatedAt ?? this.updatedAt,
+    );
+  }
+
   Map<String, dynamic> toMap() {
     return {
       'fuelType': fuelType,

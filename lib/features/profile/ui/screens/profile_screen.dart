@@ -3,6 +3,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import '../../../auth/cubit/auth_cubit.dart';
 import '../../../auth/cubit/auth_state.dart';
 import '../../../auth/ui/screens/login_screen.dart';
+import '../../../suggestions/ui/screens/admin_suggestions_screen.dart';
 
 class ProfileScreen extends StatelessWidget {
   const ProfileScreen({super.key});
@@ -53,7 +54,7 @@ class ProfileScreen extends StatelessWidget {
                     Container(
                       padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
                       decoration: BoxDecoration(
-                        color: state.user.isAdmin ? Colors.red.withOpacity(0.1) : Colors.green.withOpacity(0.1),
+                        color: state.user.isAdmin ? Colors.red.withValues(alpha: 0.1) : Colors.green.withValues(alpha: 0.1),
                         borderRadius: BorderRadius.circular(20),
                       ),
                       child: Text(
@@ -65,6 +66,24 @@ class ProfileScreen extends StatelessWidget {
                         ),
                       ),
                     ),
+                    if (state.user.isAdmin) ...[
+                      const SizedBox(height: 32),
+                      ElevatedButton.icon(
+                        onPressed: () {
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) => const AdminSuggestionsScreen(),
+                            ),
+                          );
+                        },
+                        icon: const Icon(Icons.admin_panel_settings),
+                        label: const Text('Aprovações Pendentes'),
+                        style: ElevatedButton.styleFrom(
+                          padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
+                        ),
+                      ),
+                    ],
                   ],
                 ),
               );

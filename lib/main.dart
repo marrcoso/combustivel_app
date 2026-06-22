@@ -11,6 +11,9 @@ import 'features/home/ui/screens/home_screen.dart';
 import 'features/stations/repositories/station_repository.dart';
 import 'features/stations/cubit/station_cubit.dart';
 import 'features/home/cubit/filter_cubit.dart';
+import 'features/home/cubit/home_navigation_cubit.dart';
+import 'features/suggestions/repositories/suggestion_repository.dart';
+import 'features/suggestions/cubit/suggestion_cubit.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -23,6 +26,9 @@ void main() async {
       providers: [
         RepositoryProvider(create: (context) => AuthRepository()),
         RepositoryProvider(create: (context) => StationRepository()),
+        RepositoryProvider(
+          create: (context) => SuggestionRepository(),
+        ),
       ],
       child: MultiBlocProvider(
         providers: [
@@ -37,7 +43,15 @@ void main() async {
             ),
           ),
           BlocProvider(
+            create: (context) => SuggestionCubit(
+              suggestionRepository: RepositoryProvider.of<SuggestionRepository>(context),
+            )..loadPendingSuggestions(),
+          ),
+          BlocProvider(
             create: (context) => FilterCubit(),
+          ),
+          BlocProvider(
+            create: (context) => HomeNavigationCubit(),
           ),
         ],
         child: const MainApp(),
