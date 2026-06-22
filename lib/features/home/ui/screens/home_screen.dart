@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'dart:async';
 import 'package:flutter_map/flutter_map.dart';
 import 'package:latlong2/latlong.dart';
 import 'package:geolocator/geolocator.dart';
@@ -24,12 +25,36 @@ class _HomeScreenState extends State<HomeScreen> {
   bool _hasInternet = true;
   LatLng? _currentPosition;
   final MapController _mapController = MapController();
+  StreamSubscription<ServiceStatus>? _serviceStatusStreamSubscription;
 
   @override
   void initState() {
     super.initState();
     _checkConnectivity();
     _determinePosition();
+
+    _serviceStatusStreamSubscription = Geolocator.getServiceStatusStream().listen(
+      (ServiceStatus status) {
+        if (status == ServiceStatus.enabled) {
+          _determinePosition();
+        } else {
+          if (mounted) {
+            setState(() {
+              _currentPosition = null;
+            });
+            ScaffoldMessenger.of(context).showSnackBar(
+              const SnackBar(content: Text('Atenção: O GPS do dispositivo foi desligado!')),
+            );
+          }
+        }
+      }
+    );
+  }
+
+  @override
+  void dispose() {
+    _serviceStatusStreamSubscription?.cancel();
+    super.dispose();
   }
 
   Future<void> _checkConnectivity() async {
@@ -236,9 +261,13 @@ class _HomeScreenState extends State<HomeScreen> {
         ],
       ),
       floatingActionButton: FloatingActionButton(
-        onPressed: _currentPosition != null ? () {
-          _mapController.move(_currentPosition!, 15.0);
-        } : null,
+        onPressed: () {
+          if (_currentPosition != null) {
+            _mapController.move(_currentPosition!, 15.0);
+          } else {
+            _determinePosition();
+          }
+        },
         child: const Icon(Icons.my_location),
       ),
     );
