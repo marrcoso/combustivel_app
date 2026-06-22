@@ -13,4 +13,11 @@ class StationRepository {
   Future<void> addStation(StationModel station) async {
     await _firestore.collection('stations').add(station.toMap());
   }
+
+  Future<void> updateStationPrices(String stationId, List<dynamic> newPricesMap) async {
+    await _firestore.collection('stations').doc(stationId).update({
+      'prices': newPricesMap,
+      'lastUpdate': FieldValue.serverTimestamp(),
+    });
+  }
 }

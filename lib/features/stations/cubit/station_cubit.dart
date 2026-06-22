@@ -27,6 +27,14 @@ class StationCubit extends Cubit<StationState> {
     );
   }
 
+  Future<void> updatePrices(String stationId, List<dynamic> newPricesMap) async {
+    try {
+      await _stationRepository.updateStationPrices(stationId, newPricesMap);
+    } catch (e) {
+      emit(StationError('Erro ao atualizar preços: $e'));
+    }
+  }
+
   @override
   Future<void> close() {
     _stationsSubscription?.cancel();

@@ -12,6 +12,7 @@ import '../../../stations/ui/widgets/add_station_bottom_sheet.dart';
 import '../../../stations/cubit/station_cubit.dart';
 import '../../../stations/cubit/station_state.dart';
 import '../../../profile/ui/screens/profile_screen.dart';
+import '../../../stations/ui/screens/station_details_screen.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -236,7 +237,13 @@ class _HomeScreenState extends State<HomeScreen> {
                                   const SizedBox(height: 24),
                                   ElevatedButton(
                                     onPressed: () {
-                                      Navigator.pop(context); // TODO: Navegar para detalhes
+                                      Navigator.pop(context); // Fechar modal
+                                      Navigator.push(
+                                        context,
+                                        MaterialPageRoute(
+                                          builder: (context) => StationDetailsScreen(initialStation: station),
+                                        ),
+                                      );
                                     },
                                     child: const Text('Ver Detalhes e Preços'),
                                   ),
