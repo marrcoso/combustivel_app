@@ -13,6 +13,10 @@ import '../../../stations/cubit/station_cubit.dart';
 import '../../../stations/cubit/station_state.dart';
 import '../../../profile/ui/screens/profile_screen.dart';
 import '../../../stations/ui/screens/station_details_screen.dart';
+import '../../../stations/ui/screens/station_list_tab.dart';
+import '../../cubit/filter_cubit.dart';
+import '../../cubit/filter_state.dart';
+import '../widgets/filter_bottom_sheet.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -23,6 +27,7 @@ class HomeScreen extends StatefulWidget {
 
 class _HomeScreenState extends State<HomeScreen> {
   int _currentIndex = 0;
+  bool _isSearching = false;
   bool _hasInternet = true;
   LatLng? _currentPosition;
   final MapController _mapController = MapController();
@@ -136,7 +141,6 @@ class _HomeScreenState extends State<HomeScreen> {
     }
 
     return Scaffold(
-      appBar: AppBar(title: const Text('Postos Próximos')),
       body: FlutterMap(
         mapController: _mapController,
         options: MapOptions(
@@ -177,11 +181,24 @@ class _HomeScreenState extends State<HomeScreen> {
                 ),
               ],
             ),
-          BlocBuilder<StationCubit, StationState>(
-            builder: (context, state) {
-              if (state is StationLoaded) {
-                return MarkerLayer(
-                  markers: state.stations.map((station) {
+          BlocBuilder<FilterCubit, FilterState>(
+            builder: (context, filterState) {
+              return BlocBuilder<StationCubit, StationState>(
+                builder: (context, state) {
+                  if (state is StationLoaded) {
+                    final filteredStations = state.stations.where((s) {
+                      if (filterState.searchQuery.isNotEmpty && !s.name.toLowerCase().contains(filterState.searchQuery.toLowerCase())) {
+                        return false;
+                      }
+                      if (filterState.selectedFuel != null) {
+                        final hasFuel = s.prices.any((p) => p.fuelType == filterState.selectedFuel!.displayName && p.price > 0);
+                        if (!hasFuel) return false;
+                      }
+                      return true;
+                    }).toList();
+
+                    return MarkerLayer(
+                      markers: filteredStations.map((station) {
                     return Marker(
                       point: LatLng(station.latitude, station.longitude),
                       width: 40,
@@ -260,9 +277,11 @@ class _HomeScreenState extends State<HomeScreen> {
                       ),
                     );
                   }).toList(),
-                );
-              }
-              return const SizedBox.shrink();
+                    );
+                  }
+                  return const SizedBox.shrink();
+                },
+              );
             },
           ),
         ],
@@ -284,10 +303,42 @@ class _HomeScreenState extends State<HomeScreen> {
   Widget build(BuildContext context) {
     final List<Widget> screens = [
       _buildMap(),
+      StationListTab(currentPosition: _currentPosition),
       const ProfileScreen(),
     ];
 
     return Scaffold(
+      appBar: (_currentIndex == 0 || _currentIndex == 1) ? AppBar(
+        title: _isSearching 
+          ? TextField(
+              autofocus: true,
+              decoration: const InputDecoration(hintText: 'Buscar posto...', border: InputBorder.none),
+              onChanged: (val) => context.read<FilterCubit>().updateSearchQuery(val),
+            )
+          : const Text('Postos Próximos'),
+        actions: [
+          IconButton(
+            icon: Icon(_isSearching ? Icons.close : Icons.search),
+            onPressed: () {
+              setState(() {
+                _isSearching = !_isSearching;
+                if (!_isSearching) {
+                  context.read<FilterCubit>().updateSearchQuery('');
+                }
+              });
+            },
+          ),
+          IconButton(
+            icon: const Icon(Icons.filter_list),
+            onPressed: () {
+              showModalBottomSheet(
+                context: context,
+                builder: (context) => const FilterBottomSheet(),
+              );
+            },
+          ),
+        ],
+      ) : null,
       body: IndexedStack(
         index: _currentIndex,
         children: screens,
@@ -303,6 +354,10 @@ class _HomeScreenState extends State<HomeScreen> {
           BottomNavigationBarItem(
             icon: Icon(Icons.map),
             label: 'Mapa',
+          ),
+          BottomNavigationBarItem(
+            icon: Icon(Icons.list),
+            label: 'Lista',
           ),
           BottomNavigationBarItem(
             icon: Icon(Icons.person),

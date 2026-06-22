@@ -10,6 +10,7 @@ import 'features/auth/cubit/auth_state.dart';
 import 'features/home/ui/screens/home_screen.dart';
 import 'features/stations/repositories/station_repository.dart';
 import 'features/stations/cubit/station_cubit.dart';
+import 'features/home/cubit/filter_cubit.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -34,6 +35,9 @@ void main() async {
             create: (context) => StationCubit(
               stationRepository: RepositoryProvider.of<StationRepository>(context),
             ),
+          ),
+          BlocProvider(
+            create: (context) => FilterCubit(),
           ),
         ],
         child: const MainApp(),
