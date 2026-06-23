@@ -58,6 +58,22 @@ class AuthRepository {
     return UserModel.fromMap(doc.data() ?? {}, currentUser.uid);
   }
 
+  Future<void> updateFavoriteFuelType(String? fuelType) async {
+    final currentUser = _firebaseAuth.currentUser;
+    if (currentUser == null) return;
+    await _firestore.collection('users').doc(currentUser.uid).update({
+      'favoriteFuelType': fuelType,
+    });
+  }
+
+  Future<void> updateFavoriteStation(String? stationId) async {
+    final currentUser = _firebaseAuth.currentUser;
+    if (currentUser == null) return;
+    await _firestore.collection('users').doc(currentUser.uid).update({
+      'favoriteStationId': stationId,
+    });
+  }
+
   String _handleAuthException(dynamic e) {
     if (e is FirebaseAuthException) {
       switch (e.code) {

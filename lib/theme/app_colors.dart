@@ -7,4 +7,5 @@ class AppColors {
   static const Color disabled = Color(0xFF757980);
   static const Color negative = Color(0xFFFF0004);
   static const Color secondaryNegative = Color(0xFFFFE0E0);
+  static const Color favorite = Colors.amber;
 }

@@ -3,6 +3,9 @@ import 'package:flutter/material.dart';
 import '../../models/station_model.dart';
 import '../../models/fuel_type.dart';
 import '../screens/station_details_screen.dart';
+import '../../../auth/cubit/auth_cubit.dart';
+import '../../../auth/cubit/auth_state.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 
 class StationCard extends StatelessWidget {
   final StationModel station;
@@ -26,6 +29,9 @@ class StationCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final authState = context.watch<AuthCubit>().state;
+    final isFavorite = authState is Authenticated && authState.user.favoriteStationId == station.id;
+
     Widget bottomRow;
 
     if (selectedFuel != null) {
@@ -104,110 +110,124 @@ class StationCard extends StatelessWidget {
           ),
         ],
       ),
-      child: Material(
-        color: Colors.transparent,
-        child: InkWell(
-          onTap: () {
-            Navigator.push(
-              context,
-              MaterialPageRoute(
-                builder: (context) =>
-                    StationDetailsScreen(initialStation: station),
-              ),
-            );
-          },
-          borderRadius: BorderRadius.circular(28),
-          child: Padding(
-            padding: const EdgeInsets.all(20.0),
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                Row(
+      child: Stack(
+        children: [
+          Material(
+            color: Colors.transparent,
+            child: InkWell(
+              onTap: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) =>
+                        StationDetailsScreen(initialStation: station),
+                  ),
+                );
+              },
+              borderRadius: BorderRadius.circular(28),
+              child: Padding(
+                padding: const EdgeInsets.all(20.0),
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
                   children: [
-                    Container(
-                      width: 56,
-                      height: 56,
-                      decoration: BoxDecoration(
-                        color: AppColors.primary.withValues(alpha: 0.12),
-                        shape: BoxShape.circle,
-                      ),
-                      child: const Icon(
-                        Icons.local_gas_station_outlined,
-                        color: AppColors.primary,
-                        size: 32,
-                      ),
-                    ),
-                    const SizedBox(width: 16),
-                    Expanded(
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text(
-                            station.name,
-                            style: const TextStyle(
-                              fontSize: 18,
-                              fontWeight: FontWeight.bold,
-                              color: Colors.black87,
-                            ),
-                            maxLines: 1,
-                            overflow: TextOverflow.ellipsis,
+                    Row(
+                      children: [
+                        Container(
+                          width: 56,
+                          height: 56,
+                          decoration: BoxDecoration(
+                            color: (isFavorite ? AppColors.favorite : AppColors.primary).withValues(alpha: 0.12),
+                            shape: BoxShape.circle,
                           ),
-                          const SizedBox(height: 4),
-                          Row(
+                          child: Icon(
+                            Icons.local_gas_station_outlined,
+                            color: isFavorite ? AppColors.favorite : AppColors.primary,
+                            size: 32,
+                          ),
+                        ),
+                        const SizedBox(width: 16),
+                        Expanded(
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
-                              Icon(
-                                distanceInMeters != null
-                                    ? Icons.location_on_outlined
-                                    : Icons.local_offer_outlined,
-                                size: 16,
-                                color: AppColors.disabled,
-                              ),
-                              const SizedBox(width: 4),
                               Text(
-                                distanceInMeters != null
-                                    ? _formatDistance(distanceInMeters!)
-                                    : "Sem Informação",
+                                station.name,
                                 style: const TextStyle(
-                                  fontSize: 13,
-                                  color: AppColors.disabled,
+                                  fontSize: 18,
+                                  fontWeight: FontWeight.bold,
+                                  color: Colors.black87,
                                 ),
+                                maxLines: 1,
+                                overflow: TextOverflow.ellipsis,
                               ),
-                              Padding(
-                                padding: const EdgeInsets.symmetric(
-                                  horizontal: 8.0,
-                                ),
-                                child: Text(
-                                  "\u2022",
-                                  style: TextStyle(
+                              const SizedBox(height: 4),
+                              Row(
+                                children: [
+                                  Icon(
+                                    distanceInMeters != null
+                                        ? Icons.location_on_outlined
+                                        : Icons.local_offer_outlined,
+                                    size: 16,
                                     color: AppColors.disabled,
-                                    fontSize: 13,
                                   ),
-                                ),
-                              ),
-                              Text(
-                                station.brand.isNotEmpty
-                                    ? station.brand
-                                    : 'Sem Bandeira',
-                                style: const TextStyle(
-                                  fontSize: 13,
-                                  color: AppColors.disabled,
-                                ),
+                                  const SizedBox(width: 4),
+                                  Text(
+                                    distanceInMeters != null
+                                        ? _formatDistance(distanceInMeters!)
+                                        : "Sem Informação",
+                                    style: const TextStyle(
+                                      fontSize: 13,
+                                      color: AppColors.disabled,
+                                    ),
+                                  ),
+                                  Padding(
+                                    padding: const EdgeInsets.symmetric(
+                                      horizontal: 8.0,
+                                    ),
+                                    child: Text(
+                                      "\u2022",
+                                      style: TextStyle(
+                                        color: AppColors.disabled,
+                                        fontSize: 13,
+                                      ),
+                                    ),
+                                  ),
+                                  Text(
+                                    station.brand.isNotEmpty
+                                        ? station.brand
+                                        : 'Sem Bandeira',
+                                    style: const TextStyle(
+                                      fontSize: 13,
+                                      color: AppColors.disabled,
+                                    ),
+                                  ),
+                                ],
                               ),
                             ],
                           ),
-                        ],
-                      ),
+                        ),
+                      ],
                     ),
+                    const SizedBox(height: 12),
+                    Divider(height: 1, thickness: 1, color: AppColors.disabled.withValues(alpha: .5)),
+                    const SizedBox(height: 12),
+                    bottomRow,
                   ],
                 ),
-                const SizedBox(height: 12),
-                Divider(height: 1, thickness: 1, color: AppColors.disabled.withValues(alpha: .5)),
-                const SizedBox(height: 12),
-                bottomRow,
-              ],
+              ),
             ),
           ),
-        ),
+          if (isFavorite)
+            const Positioned(
+              top: 16,
+              right: 20,
+              child: Icon(
+                Icons.star,
+                color: AppColors.favorite,
+                size: 28,
+              ),
+            ),
+        ],
       ),
     );
   }

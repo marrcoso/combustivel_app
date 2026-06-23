@@ -8,7 +8,9 @@ class FilterBottomSheet extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final selectedFuel = context.watch<FilterCubit>().state.selectedFuel;
+    final filterState = context.watch<FilterCubit>().state;
+    final selectedFuel = filterState.selectedFuel;
+    final maxDistance = filterState.maxDistanceRadius;
 
     return Padding(
       padding: const EdgeInsets.all(24.0),
@@ -27,7 +29,6 @@ class FilterBottomSheet extends StatelessWidget {
                 TextButton(
                   onPressed: () {
                     context.read<FilterCubit>().updateSelectedFuel(null);
-                    Navigator.pop(context);
                   },
                   child: const Text('Limpar'),
                 ),
@@ -44,10 +45,46 @@ class FilterBottomSheet extends StatelessWidget {
                 selected: isSelected,
                 onSelected: (selected) {
                   context.read<FilterCubit>().updateSelectedFuel(selected ? type : null);
-                  Navigator.pop(context);
                 },
               );
             }).toList(),
+          ),
+          const SizedBox(height: 24),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              const Text(
+                'Distância Máxima',
+                style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+              ),
+              if (maxDistance != null)
+                TextButton(
+                  onPressed: () {
+                    context.read<FilterCubit>().updateMaxDistance(null);
+                  },
+                  child: const Text('Ilimitado'),
+                ),
+            ],
+          ),
+          const SizedBox(height: 16),
+          Text(
+            maxDistance == null ? 'Distância Ilimitada' : 'Até ${maxDistance.toInt()} km',
+            style: const TextStyle(fontSize: 16),
+          ),
+          Slider(
+            value: maxDistance ?? 50.0,
+            min: 1.0,
+            max: 50.0,
+            divisions: 49,
+            label: maxDistance == null ? 'Ilimitado' : '${maxDistance.toInt()} km',
+            onChanged: (value) {
+              context.read<FilterCubit>().updateMaxDistance(value == 50.0 ? null : value);
+            },
+          ),
+          const SizedBox(height: 16),
+          ElevatedButton(
+            onPressed: () => Navigator.pop(context),
+            child: const Text('Aplicar Filtros'),
           ),
         ],
       ),

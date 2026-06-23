@@ -13,6 +13,10 @@ class FilterCubit extends Cubit<FilterState> {
     emit(state.copyWith(selectedFuel: fuelType, clearFuel: fuelType == null));
   }
 
+  void updateMaxDistance(double? radius) {
+    emit(state.copyWith(maxDistanceRadius: radius, clearDistance: radius == null));
+  }
+
   void clearFilters() {
     emit(const FilterState());
   }

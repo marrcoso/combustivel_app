@@ -7,6 +7,8 @@ import '../../../home/cubit/filter_cubit.dart';
 import '../../../home/cubit/filter_state.dart';
 import '../../cubit/station_cubit.dart';
 import '../../cubit/station_state.dart';
+import '../../../auth/cubit/auth_cubit.dart';
+import '../../../auth/cubit/auth_state.dart';
 import '../widgets/station_card.dart';
 
 class StationListTab extends StatelessWidget {
@@ -33,14 +35,34 @@ class StationListTab extends StatelessWidget {
                   final hasFuel = s.prices.any((p) => p.fuelType == filterState.selectedFuel!.displayName && p.price > 0);
                   if (!hasFuel) return false;
                 }
+                if (filterState.maxDistanceRadius != null && currentPosition != null) {
+                  final distance = Geolocator.distanceBetween(
+                    currentPosition!.latitude,
+                    currentPosition!.longitude,
+                    s.latitude,
+                    s.longitude,
+                  );
+                  if (distance > filterState.maxDistanceRadius! * 1000) {
+                    return false;
+                  }
+                }
                 return true;
               }).toList();
 
-              if (currentPosition != null) {
+              final authState = context.watch<AuthCubit>().state;
+              final favoriteStationId = authState is Authenticated ? authState.user.favoriteStationId : null;
+
+              if (currentPosition != null || favoriteStationId != null) {
                 stations.sort((a, b) {
-                  final distA = Geolocator.distanceBetween(currentPosition!.latitude, currentPosition!.longitude, a.latitude, a.longitude);
-                  final distB = Geolocator.distanceBetween(currentPosition!.latitude, currentPosition!.longitude, b.latitude, b.longitude);
-                  return distA.compareTo(distB);
+                  if (a.id == favoriteStationId) return -1;
+                  if (b.id == favoriteStationId) return 1;
+
+                  if (currentPosition != null) {
+                    final distA = Geolocator.distanceBetween(currentPosition!.latitude, currentPosition!.longitude, a.latitude, a.longitude);
+                    final distB = Geolocator.distanceBetween(currentPosition!.latitude, currentPosition!.longitude, b.latitude, b.longitude);
+                    return distA.compareTo(distB);
+                  }
+                  return 0;
                 });
               }
 

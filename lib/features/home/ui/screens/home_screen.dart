@@ -16,6 +16,7 @@ import '../../../stations/cubit/station_state.dart';
 import '../../../profile/ui/screens/profile_screen.dart';
 import '../../../stations/ui/screens/station_details_screen.dart';
 import '../../../stations/ui/screens/station_list_tab.dart';
+import '../../../stations/models/fuel_type.dart';
 import '../../cubit/filter_cubit.dart';
 import '../../cubit/filter_state.dart';
 import '../../cubit/home_navigation_cubit.dart';
@@ -32,6 +33,7 @@ class HomeScreen extends StatefulWidget {
 class _HomeScreenState extends State<HomeScreen> {
   bool _isSearching = false;
   bool _hasInternet = true;
+  bool _hasSetInitialFuelFilter = false;
   LatLng? _currentPosition;
   final MapController _mapController = MapController();
   StreamSubscription<ServiceStatus>? _serviceStatusStreamSubscription;
@@ -41,6 +43,21 @@ class _HomeScreenState extends State<HomeScreen> {
     super.initState();
     _checkConnectivity();
     _determinePosition();
+
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (!mounted) return;
+      final authState = context.read<AuthCubit>().state;
+      if (authState is Authenticated && !_hasSetInitialFuelFilter) {
+        if (authState.user.favoriteFuelType != null) {
+          final fuelType = FuelType.values.firstWhere(
+            (f) => f.displayName == authState.user.favoriteFuelType,
+            orElse: () => FuelType.gasolinaComum,
+          );
+          context.read<FilterCubit>().updateSelectedFuel(fuelType);
+        }
+        _hasSetInitialFuelFilter = true;
+      }
+    });
 
     _serviceStatusStreamSubscription = Geolocator.getServiceStatusStream().listen(
       (ServiceStatus status) {
@@ -226,6 +243,17 @@ class _HomeScreenState extends State<HomeScreen> {
                         final hasFuel = s.prices.any((p) => p.fuelType == filterState.selectedFuel!.displayName && p.price > 0);
                         if (!hasFuel) return false;
                       }
+                      if (filterState.maxDistanceRadius != null && _currentPosition != null) {
+                        final distance = Geolocator.distanceBetween(
+                          _currentPosition!.latitude,
+                          _currentPosition!.longitude,
+                          s.latitude,
+                          s.longitude,
+                        );
+                        if (distance > filterState.maxDistanceRadius! * 1000) {
+                          return false;
+                        }
+                      }
                       return true;
                     }).toList();
 
@@ -238,7 +266,9 @@ class _HomeScreenState extends State<HomeScreen> {
                       child: Builder(
                         builder: (context) {
                           final navState = context.watch<HomeNavigationCubit>().state;
+                          final authState = context.watch<AuthCubit>().state;
                           final isHighlighted = navState.highlightedStationId == station.id;
+                          final isFavorite = authState is Authenticated && authState.user.favoriteStationId == station.id;
 
                           return GestureDetector(
                             onTap: () {
@@ -357,9 +387,9 @@ class _HomeScreenState extends State<HomeScreen> {
                               ),
                             if (isHighlighted)
                               const Icon(Icons.arrow_drop_down, color: Colors.black87, size: 16),
-                            const Icon(
+                            Icon(
                               Icons.local_gas_station,
-                              color: AppColors.negative,
+                              color: isFavorite ? AppColors.favorite : AppColors.negative,
                               size: 40,
                             ),
                           ],
@@ -402,15 +432,34 @@ class _HomeScreenState extends State<HomeScreen> {
       const ProfileScreen(),
     ];
 
-    return BlocConsumer<HomeNavigationCubit, HomeNavigationState>(
-      listener: (context, navState) {
-        if (navState.centerMapPoint != null) {
-          _mapController.move(navState.centerMapPoint!, 15.0);
-        }
-      },
-      builder: (context, navState) {
-        final currentIndex = navState.tabIndex;
-        return Scaffold(
+    return MultiBlocListener(
+      listeners: [
+        BlocListener<HomeNavigationCubit, HomeNavigationState>(
+          listener: (context, navState) {
+            if (navState.centerMapPoint != null) {
+              _mapController.move(navState.centerMapPoint!, 15.0);
+            }
+          },
+        ),
+        BlocListener<AuthCubit, AuthState>(
+          listener: (context, authState) {
+            if (authState is Authenticated && !_hasSetInitialFuelFilter) {
+              if (authState.user.favoriteFuelType != null) {
+                final fuelType = FuelType.values.firstWhere(
+                  (f) => f.displayName == authState.user.favoriteFuelType,
+                  orElse: () => FuelType.gasolinaComum,
+                );
+                context.read<FilterCubit>().updateSelectedFuel(fuelType);
+              }
+              _hasSetInitialFuelFilter = true;
+            }
+          },
+        ),
+      ],
+      child: BlocBuilder<HomeNavigationCubit, HomeNavigationState>(
+        builder: (context, navState) {
+          final currentIndex = navState.tabIndex;
+          return Scaffold(
           backgroundColor: AppColors.background,
           appBar: (currentIndex == 0 || currentIndex == 1) 
           ? AppBar(
@@ -489,6 +538,7 @@ class _HomeScreenState extends State<HomeScreen> {
           ),
         );
       },
+    ),
     );
   }
 }

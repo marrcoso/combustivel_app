@@ -57,6 +57,25 @@ class StationDetailsScreen extends StatelessWidget {
         return Scaffold(
           appBar: AppBar(
             title: const Text('Detalhes do Posto'),
+            actions: [
+              BlocBuilder<AuthCubit, AuthState>(
+                builder: (context, authState) {
+                  final isFavorite = authState is Authenticated && authState.user.favoriteStationId == station.id;
+                  if (authState is Authenticated) {
+                    return IconButton(
+                      icon: Icon(
+                        isFavorite ? Icons.star : Icons.star_border,
+                        color: isFavorite ? Colors.amber : null,
+                      ),
+                      onPressed: () {
+                        context.read<AuthCubit>().toggleFavoriteStation(station.id);
+                      },
+                    );
+                  }
+                  return const SizedBox.shrink();
+                },
+              ),
+            ],
           ),
           body: SingleChildScrollView(
             padding: const EdgeInsets.all(16.0),

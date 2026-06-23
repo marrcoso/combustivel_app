@@ -6,6 +6,8 @@ import '../../../auth/cubit/auth_cubit.dart';
 import '../../../auth/cubit/auth_state.dart';
 import '../../../auth/ui/screens/login_screen.dart';
 import '../../../suggestions/ui/screens/admin_suggestions_screen.dart';
+import '../../../stations/models/fuel_type.dart';
+import '../../../home/cubit/filter_cubit.dart';
 
 class ProfileScreen extends StatelessWidget {
   const ProfileScreen({super.key});
@@ -92,6 +94,59 @@ class ProfileScreen extends StatelessWidget {
                               ? AppColors.negative
                               : Colors.green,
                           fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                    ),
+                    const SizedBox(height: 32),
+                    const Text(
+                      'Combustível Favorito',
+                      style: TextStyle(
+                        fontSize: 18,
+                        fontWeight: FontWeight.bold,
+                        color: Colors.black87,
+                      ),
+                    ),
+                    const SizedBox(height: 8),
+                    Container(
+                      padding: const EdgeInsets.symmetric(horizontal: 12),
+                      decoration: BoxDecoration(
+                        border: Border.all(color: AppColors.disabled.withValues(alpha: 0.5)),
+                        borderRadius: BorderRadius.circular(8),
+                      ),
+                      child: DropdownButtonHideUnderline(
+                        child: DropdownButton<String>(
+                          value: state.user.favoriteFuelType,
+                          hint: const Text('Nenhum'),
+                          items: [
+                            const DropdownMenuItem<String>(
+                              value: null,
+                              child: Text('Nenhum'),
+                            ),
+                            ...FuelType.values.map((type) {
+                              return DropdownMenuItem<String>(
+                                value: type.displayName,
+                                child: Text(type.displayName),
+                              );
+                            }),
+                          ],
+                          onChanged: (value) {
+                            if (value == null) {
+                              // If they select null, toggle to null only if it's currently not null
+                              if (state.user.favoriteFuelType != null) {
+                                context.read<AuthCubit>().toggleFavoriteFuelType(state.user.favoriteFuelType);
+                                context.read<FilterCubit>().updateSelectedFuel(null);
+                              }
+                            } else {
+                              if (state.user.favoriteFuelType != value) {
+                                context.read<AuthCubit>().toggleFavoriteFuelType(value);
+                                final fuelType = FuelType.values.firstWhere(
+                                  (f) => f.displayName == value,
+                                  orElse: () => FuelType.gasolinaComum,
+                                );
+                                context.read<FilterCubit>().updateSelectedFuel(fuelType);
+                              }
+                            }
+                          },
                         ),
                       ),
                     ),
