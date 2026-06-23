@@ -1,3 +1,6 @@
+import 'package:combustivel_ap/components/custom_button.dart';
+import 'package:combustivel_ap/components/input_text.dart';
+import 'package:combustivel_ap/theme/app_colors.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import '../../cubit/auth_cubit.dart';
@@ -58,56 +61,82 @@ class _LoginScreenState extends State<LoginScreen> {
             if (state is AuthLoading) {
               return const Center(child: CircularProgressIndicator());
             }
-            return Center(
-              child: SingleChildScrollView(
-                padding: const EdgeInsets.all(24.0),
+            return Container(
+              color: AppColors.background,
+              child: Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 42, vertical: 62),
                 child: Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    const Icon(Icons.local_gas_station, size: 100, color: Colors.blue),
-                    const SizedBox(height: 40),
-                    const Text(
-                      'Combustível App',
-                      style: TextStyle(fontSize: 28, fontWeight: FontWeight.bold),
+                    Row(
+                      children: [
+                        const Icon(
+                          Icons.local_gas_station,
+                          size: 42,
+                          color: AppColors.primary,
+                        ),
+                        const Text(
+                          'Combustível App',
+                          style: TextStyle(
+                            fontSize: 28,
+                            fontWeight: FontWeight.bold,
+                            color: AppColors.primary,
+                          ),
+                        ),
+                      ],
                     ),
-                    const SizedBox(height: 40),
-                    TextField(
-                      controller: _emailController,
-                      decoration: const InputDecoration(
-                        labelText: 'E-mail',
-                        border: OutlineInputBorder(),
-                        prefixIcon: Icon(Icons.email),
-                      ),
-                      keyboardType: TextInputType.emailAddress,
-                    ),
-                    const SizedBox(height: 20),
-                    TextField(
-                      controller: _passwordController,
-                      decoration: const InputDecoration(
-                        labelText: 'Senha',
-                        border: OutlineInputBorder(),
-                        prefixIcon: Icon(Icons.lock),
-                      ),
-                      obscureText: true,
-                    ),
-                    const SizedBox(height: 30),
-                    SizedBox(
-                      width: double.infinity,
-                      height: 50,
-                      child: ElevatedButton(
-                        onPressed: () => _authenticateWithEmailAndPassword(context),
-                        child: const Text('Entrar', style: TextStyle(fontSize: 18)),
-                      ),
-                    ),
-                    const SizedBox(height: 20),
-                    TextButton(
-                      onPressed: () {
-                        Navigator.push(
-                          context,
-                          MaterialPageRoute(builder: (context) => const RegisterScreen()),
-                        );
-                      },
-                      child: const Text('Não possui conta? Cadastre-se'),
+                    Column(
+                      spacing: 20,
+                      children: [
+                        InputText(
+                          controller: _emailController,
+                          labelText: 'E-mail',
+                          hintText: 'E-mail',
+                          icon: Icons.email,
+                          keyboardType: TextInputType.emailAddress,
+                        ),
+                        InputText(
+                          controller: _passwordController,
+                          labelText: 'Senha',
+                          hintText: 'Senha',
+                          icon: Icons.lock,
+                          obscureText: true,
+                        ),
+                        Column(
+                          spacing: 5,
+                          children: [
+                            SizedBox(
+                              width: double.infinity,
+                              height: 50,
+                              child: CustomButton(
+                                text: 'Entrar',
+                                fontSize: 18,
+                                backgroundColor: AppColors.primary,
+                                textColor: Colors.white,
+                                onPressed: () => _authenticateWithEmailAndPassword(context)
+                              ),
+                            ),
+                            const Text("ou", style: TextStyle(fontSize: 18, color: AppColors.primary)),
+                            SizedBox(
+                              width: double.infinity,
+                              height: 50,
+                              child: CustomButton(
+                                text: 'Cadastrar',
+                                fontSize: 18,
+                                backgroundColor: Colors.white,
+                                textColor: AppColors.primary,
+                                borderColor: AppColors.primary,
+                                onPressed: () {
+                                  Navigator.push(context, MaterialPageRoute(
+                                      builder: (context) => const RegisterScreen(),
+                                    ),
+                                  );
+                                },
+                              ),
+                            ),
+                          ],
+                        ),
+                      ],
                     ),
                   ],
                 ),

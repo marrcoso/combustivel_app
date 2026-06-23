@@ -1,3 +1,6 @@
+import 'package:combustivel_ap/components/custom_button.dart';
+import 'package:combustivel_ap/components/input_text.dart';
+import 'package:combustivel_ap/theme/app_colors.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import '../../cubit/auth_cubit.dart';
@@ -46,7 +49,6 @@ class _RegisterScreenState extends State<RegisterScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text('Criar Conta')),
       body: BlocListener<AuthCubit, AuthState>(
         listener: (context, state) {
           if (state is Authenticated) {
@@ -66,54 +68,85 @@ class _RegisterScreenState extends State<RegisterScreen> {
             if (state is AuthLoading) {
               return const Center(child: CircularProgressIndicator());
             }
-            return Center(
-              child: SingleChildScrollView(
-                padding: const EdgeInsets.all(24.0),
+            return Container(
+              color: AppColors.background,
+              child: Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 42, vertical: 62),
                 child: Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    const Text(
-                      'Novo Usuário',
-                      style: TextStyle(fontSize: 28, fontWeight: FontWeight.bold),
+                    Row(
+                      children: [
+                        const Icon(
+                          Icons.local_gas_station,
+                          size: 42,
+                          color: AppColors.primary,
+                        ),
+                        const SizedBox(width: 8),
+                        const Text(
+                          'Combustível App',
+                          style: TextStyle(
+                            fontSize: 28,
+                            fontWeight: FontWeight.bold,
+                            color: AppColors.primary,
+                          ),
+                        ),
+                      ],
                     ),
-                    const SizedBox(height: 40),
-                    TextField(
-                      controller: _emailController,
-                      decoration: const InputDecoration(
-                        labelText: 'E-mail',
-                        border: OutlineInputBorder(),
-                        prefixIcon: Icon(Icons.email),
-                      ),
-                      keyboardType: TextInputType.emailAddress,
-                    ),
-                    const SizedBox(height: 20),
-                    TextField(
-                      controller: _passwordController,
-                      decoration: const InputDecoration(
-                        labelText: 'Senha',
-                        border: OutlineInputBorder(),
-                        prefixIcon: Icon(Icons.lock),
-                      ),
-                      obscureText: true,
-                    ),
-                    const SizedBox(height: 20),
-                    TextField(
-                      controller: _confirmPasswordController,
-                      decoration: const InputDecoration(
-                        labelText: 'Confirmar Senha',
-                        border: OutlineInputBorder(),
-                        prefixIcon: Icon(Icons.lock_outline),
-                      ),
-                      obscureText: true,
-                    ),
-                    const SizedBox(height: 30),
-                    SizedBox(
-                      width: double.infinity,
-                      height: 50,
-                      child: ElevatedButton(
-                        onPressed: () => _authenticateWithEmailAndPassword(context),
-                        child: const Text('Cadastrar', style: TextStyle(fontSize: 18)),
-                      ),
+                    Column(
+                      spacing: 20,
+                      children: [
+                        InputText(
+                          labelText: 'E-mail',
+                          hintText: 'E-mail',
+                          icon: Icons.email,
+                          controller: _emailController,
+                          keyboardType: TextInputType.emailAddress,
+                        ),
+                        InputText(
+                          labelText: 'Senha',
+                          hintText: 'Senha',
+                          icon: Icons.lock,
+                          obscureText: true,
+                          controller: _passwordController,
+                        ),
+                        InputText(
+                          labelText: 'Confirmar Senha',
+                          hintText: 'Confirmar Senha',
+                          icon: Icons.lock_outline,
+                          obscureText: true,
+                          controller: _confirmPasswordController,
+                        ),
+                        Column(
+                          spacing: 5,
+                          children: [
+                            SizedBox(
+                              width: double.infinity,
+                              height: 50,
+                              child: CustomButton(
+                                text: 'Cadastrar',
+                                fontSize: 18,
+                                backgroundColor: AppColors.primary,
+                                textColor: Colors.white,
+                                onPressed: () => _authenticateWithEmailAndPassword(context),
+                              ),
+                            ),
+                            const Text("ou", style: TextStyle(fontSize: 18, color: AppColors.primary)),
+                            SizedBox(
+                              width: double.infinity,
+                              height: 50,
+                              child: CustomButton(
+                                text: 'Entrar',
+                                fontSize: 18,
+                                backgroundColor: Colors.white,
+                                textColor: AppColors.primary,
+                                borderColor: AppColors.primary,
+                                onPressed: () => Navigator.pop(context),
+                              ),
+                            ),
+                          ],
+                        ),
+                      ],
                     ),
                   ],
                 ),
@@ -125,3 +158,4 @@ class _RegisterScreenState extends State<RegisterScreen> {
     );
   }
 }
+
