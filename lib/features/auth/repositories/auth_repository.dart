@@ -77,6 +77,8 @@ class AuthRepository {
   String _handleAuthException(dynamic e) {
     if (e is FirebaseAuthException) {
       switch (e.code) {
+        case 'invalid-credential':
+          return 'E-mail ou senha incorretos.';
         case 'user-not-found':
           return 'Nenhum usuário encontrado para esse e-mail.';
         case 'wrong-password':
