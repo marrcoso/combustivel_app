@@ -108,6 +108,7 @@ class ProfileScreen extends StatelessWidget {
                     ),
                     const SizedBox(height: 8),
                     Container(
+                      width: 300,
                       padding: const EdgeInsets.symmetric(horizontal: 12),
                       decoration: BoxDecoration(
                         border: Border.all(color: AppColors.disabled.withValues(alpha: 0.5)),
@@ -115,6 +116,7 @@ class ProfileScreen extends StatelessWidget {
                       ),
                       child: DropdownButtonHideUnderline(
                         child: DropdownButton<String>(
+                          isExpanded: true,
                           value: state.user.favoriteFuelType,
                           hint: const Text('Nenhum'),
                           items: [
