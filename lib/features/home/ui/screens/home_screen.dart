@@ -1,7 +1,7 @@
+import 'package:combustivel_ap/components/custom_snack_bar.dart' show CustomSnackBar;
 import 'package:flutter/material.dart';
 import 'dart:async';
 import 'package:combustivel_ap/theme/app_colors.dart';
-import 'package:combustivel_ap/components/custom_button.dart';
 import 'package:flutter_map/flutter_map.dart';
 import 'package:latlong2/latlong.dart';
 import 'package:geolocator/geolocator.dart';
@@ -14,7 +14,6 @@ import '../../../stations/ui/widgets/add_station_bottom_sheet.dart';
 import '../../../stations/cubit/station_cubit.dart';
 import '../../../stations/cubit/station_state.dart';
 import '../../../profile/ui/screens/profile_screen.dart';
-import '../../../stations/ui/screens/station_details_screen.dart';
 import '../../../stations/ui/screens/station_list_tab.dart';
 import '../../../stations/models/fuel_type.dart';
 import '../../cubit/filter_cubit.dart';
@@ -69,9 +68,7 @@ class _HomeScreenState extends State<HomeScreen> {
             setState(() {
               _currentPosition = null;
             });
-            ScaffoldMessenger.of(context).showSnackBar(
-              const SnackBar(content: Text('Atenção: O GPS do dispositivo foi desligado!')),
-            );
+            CustomSnackBar.error(context, 'Atenção: O GPS do dispositivo foi desligado!');
           }
         }
       }
@@ -104,9 +101,7 @@ class _HomeScreenState extends State<HomeScreen> {
     serviceEnabled = await Geolocator.isLocationServiceEnabled();
     if (!serviceEnabled) {
       if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Atenção: O GPS do dispositivo está desligado!')),
-        );
+        CustomSnackBar.error(context, 'Atenção: O GPS do dispositivo está desligado!');
       }
       return;
     }
@@ -116,9 +111,7 @@ class _HomeScreenState extends State<HomeScreen> {
       permission = await Geolocator.requestPermission();
       if (permission == LocationPermission.denied) {
         if (mounted) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(content: Text('A permissão de GPS foi negada.')),
-          );
+          CustomSnackBar.error(context, 'A permissão de GPS foi negada.');
         }
         return;
       }
@@ -140,9 +133,7 @@ class _HomeScreenState extends State<HomeScreen> {
       }
     } catch (e) {
       if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Erro ao tentar encontrar o GPS: $e. Verifique se o emulador tem uma localização configurada.')),
-        );
+        CustomSnackBar.error(context, 'Erro ao tentar encontrar o GPS: $e. Verifique se o emulador tem uma localização configurada.');
       }
     }
   }
@@ -179,9 +170,7 @@ class _HomeScreenState extends State<HomeScreen> {
                 builder: (context) => AddStationBottomSheet(position: point),
               );
             } else {
-              ScaffoldMessenger.of(context).showSnackBar(
-                const SnackBar(content: Text('Apenas administradores podem adicionar postos. Vá no Firebase e mude isAdmin: true na sua conta para testar.')),
-              );
+              CustomSnackBar.error(context, 'Apenas administradores podem adicionar postos. Vá no Firebase e mude isAdmin: true na sua conta para testar.');
             }
           },
         ),

@@ -1,3 +1,4 @@
+import 'package:combustivel_ap/components/custom_snack_bar.dart' show CustomSnackBar;
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import '../../models/station_model.dart';
@@ -58,9 +59,7 @@ class _EditPricesBottomSheetState extends State<EditPricesBottomSheet> {
       context.read<StationCubit>().updatePrices(widget.station.id, newPricesMap);
       
       Navigator.pop(context);
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Preços atualizados com sucesso!')),
-      );
+      CustomSnackBar.success(context, 'Preços atualizados com sucesso!');
     }
   }
 

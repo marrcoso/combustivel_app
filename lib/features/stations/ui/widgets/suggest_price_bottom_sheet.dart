@@ -1,3 +1,4 @@
+import 'package:combustivel_ap/components/custom_snack_bar.dart' show CustomSnackBar;
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
@@ -58,15 +59,11 @@ class _SuggestPriceBottomSheetState extends State<SuggestPriceBottomSheet> {
 
         if (mounted) {
           Navigator.pop(context);
-          ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(content: Text('Sugestão enviada com sucesso! Ela será avaliada por um administrador.')),
-          );
+          CustomSnackBar.success(context, 'Sugestão enviada com sucesso! Ela será avaliada por um administrador.');
         }
       } catch (e) {
         if (mounted) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(content: Text('Erro ao enviar sugestão. Tente novamente.')),
-          );
+          CustomSnackBar.error(context, 'Erro ao enviar sugestão. Tente novamente.');
         }
       } finally {
         if (mounted) {
@@ -76,9 +73,7 @@ class _SuggestPriceBottomSheetState extends State<SuggestPriceBottomSheet> {
         }
       }
     } else if (_selectedFuel == null) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Selecione o tipo de combustível')),
-      );
+      CustomSnackBar.error(context, 'Selecione o tipo de combustível');
     }
   }
 

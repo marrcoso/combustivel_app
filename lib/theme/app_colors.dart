@@ -8,4 +8,5 @@ class AppColors {
   static const Color negative = Color(0xFFFF0004);
   static const Color secondaryNegative = Color(0xFFFFE0E0);
   static const Color favorite = Colors.amber;
+  static const Color positive = Color(0xFF34C759);
 }

@@ -1,3 +1,4 @@
+import 'package:combustivel_ap/components/custom_snack_bar.dart' show CustomSnackBar;
 import 'package:flutter/material.dart';
 import 'package:latlong2/latlong.dart';
 import '../../models/station_model.dart';
@@ -49,15 +50,11 @@ class _AddStationBottomSheetState extends State<AddStationBottomSheet> {
 
         if (mounted) {
           Navigator.of(context).pop(); // Fecha o modal
-          ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(content: Text('Posto cadastrado com sucesso!')),
-          );
+          CustomSnackBar.success(context, 'Posto cadastrado com sucesso!');
         }
       } catch (e) {
         if (mounted) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(content: Text('Erro ao cadastrar: $e')),
-          );
+          CustomSnackBar.error(context, 'Erro ao cadastrar: $e');
         }
       } finally {
         if (mounted) {

@@ -1,3 +1,4 @@
+import 'package:combustivel_ap/components/custom_snack_bar.dart' show CustomSnackBar;
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import '../../../stations/cubit/station_cubit.dart';
@@ -59,7 +60,7 @@ class AdminSuggestionsScreen extends StatelessWidget {
                             TextButton.icon(
                               onPressed: () {
                                 context.read<SuggestionCubit>().rejectSuggestion(suggestion.id);
-                                ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Sugestão rejeitada.')));
+                                CustomSnackBar.error(context, 'Sugestão rejeitada.');
                               },
                               icon: const Icon(Icons.close, color: Colors.red),
                               label: const Text('Rejeitar', style: TextStyle(color: Colors.red)),
@@ -69,7 +70,6 @@ class AdminSuggestionsScreen extends StatelessWidget {
                               onPressed: () async {
                                 final stationCubit = context.read<StationCubit>();
                                 final suggestionCubit = context.read<SuggestionCubit>();
-                                final scaffoldMessenger = ScaffoldMessenger.of(context);
                                 
                                 final stationState = stationCubit.state;
                                 
@@ -101,12 +101,12 @@ class AdminSuggestionsScreen extends StatelessWidget {
                                     // 2. Só depois aprova o status (o que fará o botão sumir)
                                     await suggestionCubit.approveSuggestion(suggestion.id);
 
-                                    scaffoldMessenger.showSnackBar(const SnackBar(content: Text('Sugestão APROVADA e preço atualizado!')));
+                                    CustomSnackBar.success(context, 'Sugestão APROVADA e preço atualizado!');
                                   } catch (e) {
-                                    scaffoldMessenger.showSnackBar(SnackBar(content: Text('Erro: $e')));
+                                    CustomSnackBar.error(context, 'Erro: $e');
                                   }
                                 } else {
-                                  scaffoldMessenger.showSnackBar(const SnackBar(content: Text('Erro: Postos não carregados ainda.')));
+                                  CustomSnackBar.error(context, 'Erro: Postos não carregados ainda.');
                                 }
                               },
                               icon: const Icon(Icons.check),

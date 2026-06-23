@@ -1,4 +1,5 @@
 import 'package:combustivel_ap/components/custom_button.dart';
+import 'package:combustivel_ap/components/custom_snack_bar.dart';
 import 'package:combustivel_ap/components/input_text.dart';
 import 'package:combustivel_ap/theme/app_colors.dart';
 import 'package:flutter/material.dart';
@@ -25,16 +26,14 @@ class _LoginScreenState extends State<LoginScreen> {
     super.dispose();
   }
 
-  void _authenticateWithEmailAndPassword(context) {
+  void _authenticateWithEmailAndPassword(BuildContext context) {
     if (_emailController.text.isNotEmpty && _passwordController.text.isNotEmpty) {
       BlocProvider.of<AuthCubit>(context).signIn(
         email: _emailController.text,
         password: _passwordController.text,
       );
     } else {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Preencha os campos de e-mail e senha.')),
-      );
+      CustomSnackBar.error(context, 'Preencha os campos de e-mail e senha.');
     }
   }
 
@@ -44,9 +43,7 @@ class _LoginScreenState extends State<LoginScreen> {
       body: BlocListener<AuthCubit, AuthState>(
         listener: (context, state) {
           if (state is AuthError) {
-            ScaffoldMessenger.of(context).showSnackBar(
-              SnackBar(content: Text(state.message)),
-            );
+            CustomSnackBar.error(context, state.message);
           }
         },
         child: BlocBuilder<AuthCubit, AuthState>(

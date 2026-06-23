@@ -1,4 +1,5 @@
 import 'package:combustivel_ap/components/custom_button.dart';
+import 'package:combustivel_ap/components/custom_snack_bar.dart';
 import 'package:combustivel_ap/components/input_text.dart';
 import 'package:combustivel_ap/theme/app_colors.dart';
 import 'package:flutter/material.dart';
@@ -26,11 +27,9 @@ class _RegisterScreenState extends State<RegisterScreen> {
     super.dispose();
   }
 
-  void _authenticateWithEmailAndPassword(context) {
+  void _authenticateWithEmailAndPassword(BuildContext context) {
     if (_passwordController.text != _confirmPasswordController.text) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('As senhas não coincidem.')),
-      );
+      CustomSnackBar.error(context, 'As senhas não coincidem.');
       return;
     }
 
@@ -40,9 +39,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
         password: _passwordController.text,
       );
     } else {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Preencha todos os campos.')),
-      );
+      CustomSnackBar.error(context, 'Preencha todos os campos.');
     }
   }
 
@@ -53,14 +50,10 @@ class _RegisterScreenState extends State<RegisterScreen> {
         listener: (context, state) {
           if (state is Authenticated) {
             Navigator.pop(context);
-            ScaffoldMessenger.of(context).showSnackBar(
-              const SnackBar(content: Text('Conta criada com sucesso!')),
-            );
+            CustomSnackBar.success(context, 'Conta criada com sucesso!');
           }
           if (state is AuthError) {
-            ScaffoldMessenger.of(context).showSnackBar(
-              SnackBar(content: Text(state.message)),
-            );
+            CustomSnackBar.error(context, state.message);
           }
         },
         child: BlocBuilder<AuthCubit, AuthState>(

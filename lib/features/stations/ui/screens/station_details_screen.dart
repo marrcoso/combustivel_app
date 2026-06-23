@@ -1,3 +1,4 @@
+import 'package:combustivel_ap/components/custom_snack_bar.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:url_launcher/url_launcher.dart';
@@ -26,16 +27,12 @@ class StationDetailsScreen extends StatelessWidget {
         await launchUrl(geoUrl);
       } else {
         if (context.mounted) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(content: Text('Nenhum aplicativo de mapas encontrado no dispositivo.')),
-          );
+          CustomSnackBar.error(context, 'Nenhum aplicativo de mapas encontrado no dispositivo.');
         }
       }
     } catch (e) {
       if (context.mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Erro ao tentar abrir o mapa.')),
-        );
+        CustomSnackBar.error(context, 'Erro ao tentar abrir o mapa.');
       }
     }
   }
