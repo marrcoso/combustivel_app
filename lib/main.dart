@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -21,6 +22,9 @@ void main() async {
   await Firebase.initializeApp(
     options: DefaultFirebaseOptions.currentPlatform,
   );
+  await SystemChrome.setPreferredOrientations([
+    DeviceOrientation.portraitUp
+  ]);
 
   runApp(
     MultiRepositoryProvider(
@@ -77,8 +81,8 @@ class MainApp extends StatelessWidget {
       home: BlocBuilder<AuthCubit, AuthState>(
         builder: (context, state) {
           return switch (state) {
-            AuthInitial() || AuthLoading() => const Scaffold(body: Center(child: CircularProgressIndicator())),
-            Authenticated() => const HomeScreen(),
+            AuthInitial() => const Scaffold(body: Center(child: CircularProgressIndicator())),
+            Authenticated() => const HomeScreen(), 
             _ => const LoginScreen(),
           };
         },
