@@ -1,3 +1,5 @@
+import 'package:combustivel_ap/features/profile/ui/screens/profile_dialogs.dart';
+import 'package:combustivel_ap/theme/app_colors.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import '../../../auth/cubit/auth_cubit.dart';
@@ -11,13 +13,22 @@ class ProfileScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: AppColors.background,
       appBar: AppBar(
-        title: const Text('Meu Perfil'),
+        backgroundColor: AppColors.background,
+        elevation: 0,
+        title: const Text(
+          'Meu Perfil',
+          style: TextStyle(
+            color: AppColors.primary,
+            fontWeight: FontWeight.bold,
+          ),
+        ),
         actions: [
           IconButton(
-            icon: const Icon(Icons.logout),
+            icon: const Icon(Icons.logout, color: AppColors.primary),
             onPressed: () {
-              context.read<AuthCubit>().signOut();
+              ProfileDialogs().showLogoutDialog(context);
             },
           )
         ],
@@ -39,29 +50,47 @@ class ProfileScreen extends StatelessWidget {
                 child: Column(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    const Icon(Icons.account_circle, size: 100, color: Colors.blue),
+                    const Icon(
+                      Icons.account_circle,
+                      size: 100,
+                      color: AppColors.primary,
+                    ),
                     const SizedBox(height: 20),
                     const Text(
                       'Bem-vindo!',
-                      style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
+                      style: TextStyle(
+                        fontSize: 24,
+                        fontWeight: FontWeight.bold,
+                        color: Colors.black87,
+                      ),
                     ),
                     const SizedBox(height: 10),
                     Text(
                       state.user.email,
-                      style: const TextStyle(fontSize: 18, color: Colors.black54),
+                      style: const TextStyle(
+                        fontSize: 18,
+                        color: AppColors.disabled,
+                      ),
                     ),
-                    const SizedBox(height: 10),
+                    const SizedBox(height: 16),
                     Container(
-                      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 16,
+                        vertical: 8,
+                      ),
                       decoration: BoxDecoration(
-                        color: state.user.isAdmin ? Colors.red.withValues(alpha: 0.1) : Colors.green.withValues(alpha: 0.1),
+                        color: state.user.isAdmin
+                            ? AppColors.negative.withValues(alpha: 0.1)
+                            : Colors.green.withValues(alpha: 0.1),
                         borderRadius: BorderRadius.circular(20),
                       ),
                       child: Text(
                         state.user.isAdmin ? 'Administrador' : 'Usuário Comum',
                         style: TextStyle(
                           fontSize: 14,
-                          color: state.user.isAdmin ? Colors.red : Colors.green,
+                          color: state.user.isAdmin
+                              ? AppColors.negative
+                              : Colors.green,
                           fontWeight: FontWeight.bold,
                         ),
                       ),
@@ -73,14 +102,32 @@ class ProfileScreen extends StatelessWidget {
                           Navigator.push(
                             context,
                             MaterialPageRoute(
-                              builder: (context) => const AdminSuggestionsScreen(),
+                              builder: (context) =>
+                                  const AdminSuggestionsScreen(),
                             ),
                           );
                         },
-                        icon: const Icon(Icons.admin_panel_settings),
-                        label: const Text('Aprovações Pendentes'),
+                        icon: const Icon(
+                          Icons.admin_panel_settings,
+                          color: Colors.white,
+                        ),
+                        label: const Text(
+                          'Aprovações Pendentes',
+                          style: TextStyle(
+                            color: Colors.white,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
                         style: ElevatedButton.styleFrom(
-                          padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
+                          backgroundColor: AppColors.primary,
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: 24,
+                            vertical: 14,
+                          ),
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(12),
+                          ),
+                          elevation: 2,
                         ),
                       ),
                     ],
@@ -95,3 +142,4 @@ class ProfileScreen extends StatelessWidget {
     );
   }
 }
+

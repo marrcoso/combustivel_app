@@ -1,3 +1,4 @@
+import 'package:combustivel_ap/theme/app_colors.dart';
 import 'package:flutter/material.dart';
 import '../../models/station_model.dart';
 import '../../models/fuel_type.dart';
@@ -25,74 +26,186 @@ class StationCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    Widget priceWidget = const SizedBox.shrink();
+    Widget bottomRow;
 
     if (selectedFuel != null) {
+      double price = 0.0;
       try {
-        final priceModel = station.prices.firstWhere((p) => p.fuelType == selectedFuel!.displayName);
-        priceWidget = Text(
-          'R\$ ${priceModel.price.toStringAsFixed(2)}',
-          style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: Colors.green),
+        final priceModel = station.prices.firstWhere(
+          (p) => p.fuelType == selectedFuel!.displayName,
         );
+        price = priceModel.price;
       } catch (_) {}
+
+      bottomRow = Row(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        children: [
+          Text(
+            selectedFuel!.displayName,
+            style: const TextStyle(
+              fontSize: 18,
+              fontWeight: FontWeight.bold,
+              color: Colors.black87,
+            ),
+          ),
+          Column(
+            crossAxisAlignment: CrossAxisAlignment.end,
+            children: [
+              Text(
+                'Preço p/ litro',
+                style: TextStyle(fontSize: 11, color: AppColors.disabled),
+              ),
+              Text(
+                price > 0 ? 'R\$${price.toStringAsFixed(2)}' : 'S/ Preço',
+                style: const TextStyle(
+                  fontSize: 24,
+                  fontWeight: FontWeight.bold,
+                  color: AppColors.primary,
+                ),
+              ),
+            ],
+          ),
+        ],
+      );
     } else {
-      priceWidget = Text(
-        '${station.prices.length} combustíveis disponíveis',
-        style: const TextStyle(fontSize: 14, color: Colors.grey),
+      bottomRow = Row(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        children: [
+          const Text(
+            'Combustíveis',
+            style: TextStyle(
+              fontSize: 16,
+              fontWeight: FontWeight.bold,
+              color: Colors.black87,
+            ),
+          ),
+          Text(
+            station.prices.length == 1 ? '${station.prices.length} tipo' : '${station.prices.length} tipos',
+            style: const TextStyle(
+              fontSize: 16,
+              fontWeight: FontWeight.bold,
+              color: AppColors.primary,
+            ),
+          ),
+        ],
       );
     }
 
-    return Card(
+    return Container(
       margin: const EdgeInsets.only(bottom: 16),
-      child: InkWell(
-        onTap: () {
-          Navigator.push(
-            context,
-            MaterialPageRoute(
-              builder: (context) => StationDetailsScreen(initialStation: station),
-            ),
-          );
-        },
-        borderRadius: BorderRadius.circular(12),
-        child: Padding(
-          padding: const EdgeInsets.all(16.0),
-          child: Row(
-            children: [
-              const Icon(Icons.local_gas_station, size: 40, color: Colors.blue),
-              const SizedBox(width: 16),
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      station.name,
-                      style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-                      maxLines: 1,
-                      overflow: TextOverflow.ellipsis,
-                    ),
-                    const SizedBox(height: 4),
-                    Text(
-                      station.brand.isNotEmpty ? station.brand : 'Sem Bandeira',
-                      style: const TextStyle(fontSize: 14, color: Colors.grey),
-                    ),
-                    const SizedBox(height: 8),
-                    priceWidget,
-                  ],
-                ),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(28),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withValues(alpha: 0.04),
+            blurRadius: 10,
+            offset: const Offset(0, 4),
+          ),
+        ],
+      ),
+      child: Material(
+        color: Colors.transparent,
+        child: InkWell(
+          onTap: () {
+            Navigator.push(
+              context,
+              MaterialPageRoute(
+                builder: (context) =>
+                    StationDetailsScreen(initialStation: station),
               ),
-              if (distanceInMeters != null)
-                Column(
-                  crossAxisAlignment: CrossAxisAlignment.end,
+            );
+          },
+          borderRadius: BorderRadius.circular(28),
+          child: Padding(
+            padding: const EdgeInsets.all(20.0),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Row(
                   children: [
-                    const Icon(Icons.location_on, size: 16, color: Colors.grey),
-                    const SizedBox(height: 4),
-                    Text(
-                      _formatDistance(distanceInMeters!),
-                      style: const TextStyle(fontSize: 14, fontWeight: FontWeight.bold),
+                    Container(
+                      width: 56,
+                      height: 56,
+                      decoration: BoxDecoration(
+                        color: AppColors.primary.withValues(alpha: 0.12),
+                        shape: BoxShape.circle,
+                      ),
+                      child: const Icon(
+                        Icons.local_gas_station_outlined,
+                        color: AppColors.primary,
+                        size: 32,
+                      ),
+                    ),
+                    const SizedBox(width: 16),
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            station.name,
+                            style: const TextStyle(
+                              fontSize: 18,
+                              fontWeight: FontWeight.bold,
+                              color: Colors.black87,
+                            ),
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
+                          ),
+                          const SizedBox(height: 4),
+                          Row(
+                            children: [
+                              Icon(
+                                distanceInMeters != null
+                                    ? Icons.location_on_outlined
+                                    : Icons.local_offer_outlined,
+                                size: 16,
+                                color: AppColors.disabled,
+                              ),
+                              const SizedBox(width: 4),
+                              Text(
+                                distanceInMeters != null
+                                    ? _formatDistance(distanceInMeters!)
+                                    : "Sem Informação",
+                                style: const TextStyle(
+                                  fontSize: 13,
+                                  color: AppColors.disabled,
+                                ),
+                              ),
+                              Padding(
+                                padding: const EdgeInsets.symmetric(
+                                  horizontal: 8.0,
+                                ),
+                                child: Text(
+                                  "\u2022",
+                                  style: TextStyle(
+                                    color: AppColors.disabled,
+                                    fontSize: 13,
+                                  ),
+                                ),
+                              ),
+                              Text(
+                                station.brand.isNotEmpty
+                                    ? station.brand
+                                    : 'Sem Bandeira',
+                                style: const TextStyle(
+                                  fontSize: 13,
+                                  color: AppColors.disabled,
+                                ),
+                              ),
+                            ],
+                          ),
+                        ],
+                      ),
                     ),
                   ],
                 ),
-            ],
+                const SizedBox(height: 12),
+                Divider(height: 1, thickness: 1, color: AppColors.disabled.withValues(alpha: .5)),
+                const SizedBox(height: 12),
+                bottomRow,
+              ],
+            ),
           ),
         ),
       ),

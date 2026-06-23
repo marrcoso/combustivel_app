@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'dart:async';
+import 'package:combustivel_ap/theme/app_colors.dart';
+import 'package:combustivel_ap/components/custom_button.dart';
 import 'package:flutter_map/flutter_map.dart';
 import 'package:latlong2/latlong.dart';
 import 'package:geolocator/geolocator.dart';
@@ -133,9 +135,9 @@ class _HomeScreenState extends State<HomeScreen> {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Icon(Icons.wifi_off, size: 80, color: Colors.grey),
+            Icon(Icons.wifi_off, size: 80, color: AppColors.disabled),
             SizedBox(height: 20),
-            Text('Sem conexão com a internet', style: TextStyle(fontSize: 18)),
+            Text('Sem conexão com a internet', style: TextStyle(fontSize: 18, color: AppColors.disabled, fontWeight: FontWeight.bold)),
           ],
         ),
       );
@@ -201,7 +203,7 @@ class _HomeScreenState extends State<HomeScreen> {
                             const Icon(Icons.arrow_drop_down, color: Colors.black87, size: 16),
                           const Icon(
                             Icons.my_location,
-                            color: Colors.blue,
+                            color: AppColors.primary,
                             size: 40,
                           ),
                         ],
@@ -254,7 +256,7 @@ class _HomeScreenState extends State<HomeScreen> {
                                 children: [
                                   Row(
                                     children: [
-                                      const Icon(Icons.local_gas_station, size: 40, color: Colors.blue),
+                                      const Icon(Icons.local_gas_station, size: 40, color: AppColors.primary),
                                       const SizedBox(width: 16),
                                       Expanded(
                                         child: Column(
@@ -315,7 +317,11 @@ class _HomeScreenState extends State<HomeScreen> {
                                     ],
                                   ),
                                   const SizedBox(height: 24),
-                                  ElevatedButton(
+                                  CustomButton(
+                                    text: 'Ver Detalhes e Preços',
+                                    backgroundColor: AppColors.primary,
+                                    textColor: Colors.white,
+                                    fontSize: 16,
                                     onPressed: () {
                                       Navigator.pop(context); // Fechar modal
                                       Navigator.push(
@@ -325,7 +331,6 @@ class _HomeScreenState extends State<HomeScreen> {
                                         ),
                                       );
                                     },
-                                    child: const Text('Ver Detalhes e Preços'),
                                   ),
                                 ],
                               ),
@@ -354,7 +359,7 @@ class _HomeScreenState extends State<HomeScreen> {
                               const Icon(Icons.arrow_drop_down, color: Colors.black87, size: 16),
                             const Icon(
                               Icons.local_gas_station,
-                              color: Colors.red,
+                              color: AppColors.negative,
                               size: 40,
                             ),
                           ],
@@ -374,6 +379,8 @@ class _HomeScreenState extends State<HomeScreen> {
         ],
       ),
       floatingActionButton: FloatingActionButton(
+        backgroundColor: AppColors.primary,
+        foregroundColor: Colors.white,
         onPressed: () {
           if (_currentPosition != null) {
             _mapController.move(_currentPosition!, 15.0);
@@ -404,14 +411,27 @@ class _HomeScreenState extends State<HomeScreen> {
       builder: (context, navState) {
         final currentIndex = navState.tabIndex;
         return Scaffold(
-          appBar: (currentIndex == 0 || currentIndex == 1) ? AppBar(
+          backgroundColor: AppColors.background,
+          appBar: (currentIndex == 0 || currentIndex == 1) 
+          ? AppBar(
+            backgroundColor: AppColors.background,
+            elevation: 0,
             title: _isSearching 
               ? TextField(
                   autofocus: true,
-                  decoration: const InputDecoration(hintText: 'Buscar posto...', border: InputBorder.none),
+                  style: const TextStyle(color: AppColors.primary),
+                  decoration: const InputDecoration(
+                    hintText: 'Buscar posto...',
+                    border: InputBorder.none,
+                    hintStyle: TextStyle(color: AppColors.disabled),
+                  ),
                   onChanged: (val) => context.read<FilterCubit>().updateSearchQuery(val),
                 )
-              : const Text('Postos Próximos'),
+              : const Text(
+                  'Postos Próximos',
+                  style: TextStyle(color: AppColors.primary, fontWeight: FontWeight.bold),
+                ),
+            iconTheme: const IconThemeData(color: AppColors.primary),
             actions: [
               IconButton(
                 icon: Icon(_isSearching ? Icons.close : Icons.search),
@@ -441,6 +461,14 @@ class _HomeScreenState extends State<HomeScreen> {
           ),
           bottomNavigationBar: BottomNavigationBar(
             currentIndex: currentIndex,
+            selectedItemColor: AppColors.primary,
+            unselectedItemColor: AppColors.disabled,
+            backgroundColor: AppColors.background,
+            selectedLabelStyle: TextStyle(
+              color: AppColors.primary,
+              fontWeight: FontWeight.bold,
+            ),
+            elevation: 10,
             onTap: (index) {
               context.read<HomeNavigationCubit>().changeTab(index);
             },
@@ -450,8 +478,8 @@ class _HomeScreenState extends State<HomeScreen> {
                 label: 'Mapa',
               ),
               BottomNavigationBarItem(
-                icon: Icon(Icons.list),
-                label: 'Lista',
+                icon: Icon(Icons.attach_money),
+                label: 'Preços',
               ),
               BottomNavigationBarItem(
                 icon: Icon(Icons.person),
