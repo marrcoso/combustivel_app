@@ -1,6 +1,7 @@
 import 'package:combustivel_ap/components/custom_button.dart';
 import 'package:combustivel_ap/components/custom_snack_bar.dart';
 import 'package:combustivel_ap/components/input_text.dart';
+import 'package:combustivel_ap/features/auth/ui/screens/login_screen.dart';
 import 'package:combustivel_ap/theme/app_colors.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -49,7 +50,6 @@ class _RegisterScreenState extends State<RegisterScreen> {
       body: BlocListener<AuthCubit, AuthState>(
         listener: (context, state) {
           if (state is Authenticated) {
-            Navigator.pop(context);
             CustomSnackBar.success(context, 'Conta criada com sucesso!');
           }
           if (state is AuthError) {
@@ -134,7 +134,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                                 backgroundColor: Colors.white,
                                 textColor: AppColors.primary,
                                 borderColor: AppColors.primary,
-                                onPressed: () => Navigator.pop(context),
+                                onPressed: () => Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) => const LoginScreen())),
                               ),
                             ),
                           ],

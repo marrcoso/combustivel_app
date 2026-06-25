@@ -116,12 +116,7 @@ class _LoginScreenState extends State<LoginScreen> {
                                 backgroundColor: Colors.white,
                                 textColor: AppColors.primary,
                                 borderColor: AppColors.primary,
-                                onPressed: () {
-                                  Navigator.push(context, MaterialPageRoute(
-                                      builder: (context) => const RegisterScreen(),
-                                    ),
-                                  );
-                                },
+                                onPressed: () => Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) => const RegisterScreen()))
                               ),
                             ),
                           ],
