@@ -182,12 +182,7 @@ class StationMarkerWidget extends StatelessWidget {
                       fontSize: 16,
                       onPressed: () {
                         Navigator.pop(context); // Fechar modal
-                        Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                            builder: (context) => StationDetailsScreen(initialStation: station),
-                          ),
-                        );
+                        Navigator.push(context, MaterialPageRoute(builder: (context) => StationDetailsScreen(initialStation: station)));
                       },
                     ),
                   ],
