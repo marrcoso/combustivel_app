@@ -365,49 +365,7 @@ class _HomeScreenState extends State<HomeScreen> {
           final currentIndex = navState.tabIndex;
           return Scaffold(
           backgroundColor: AppColors.background,
-          appBar: (currentIndex == 0 || currentIndex == 1) 
-          ? AppBar(
-            backgroundColor: AppColors.background,
-            elevation: 0,
-            title: _isSearching 
-              ? TextField(
-                  autofocus: true,
-                  style: const TextStyle(color: AppColors.primary),
-                  decoration: const InputDecoration(
-                    hintText: 'Buscar posto...',
-                    border: InputBorder.none,
-                    hintStyle: TextStyle(color: AppColors.disabled),
-                  ),
-                  onChanged: (val) => context.read<FilterCubit>().updateSearchQuery(val),
-                )
-              : const Text(
-                  'Postos Próximos',
-                  style: TextStyle(color: AppColors.primary, fontWeight: FontWeight.bold),
-                ),
-            iconTheme: const IconThemeData(color: AppColors.primary),
-            actions: [
-              IconButton(
-                icon: Icon(_isSearching ? Icons.close : Icons.search),
-                onPressed: () {
-                  setState(() {
-                    _isSearching = !_isSearching;
-                    if (!_isSearching) {
-                      context.read<FilterCubit>().updateSearchQuery('');
-                    }
-                  });
-                },
-              ),
-              IconButton(
-                icon: const Icon(Icons.filter_list),
-                onPressed: () {
-                  showModalBottomSheet(
-                    context: context,
-                    builder: (context) => const FilterBottomSheet(),
-                  );
-                },
-              ),
-            ],
-          ) : null,
+          appBar: currentIndex == 0 || currentIndex == 1 ? homeAppBar(context) : null,
           body: IndexedStack(
             index: currentIndex,
             children: screens,
@@ -444,6 +402,51 @@ class _HomeScreenState extends State<HomeScreen> {
         );
       },
     ),
+    );
+  }
+
+  AppBar homeAppBar(BuildContext context) {
+    return AppBar(
+      backgroundColor: AppColors.background,
+      elevation: 0,
+      title: _isSearching 
+        ? TextField(
+            autofocus: true,
+            style: const TextStyle(color: AppColors.primary),
+            decoration: const InputDecoration(
+              hintText: 'Buscar posto...',
+              border: InputBorder.none,
+              hintStyle: TextStyle(color: AppColors.disabled),
+            ),
+            onChanged: (val) => context.read<FilterCubit>().updateSearchQuery(val),
+          )
+        : const Text(
+            'Postos Próximos',
+            style: TextStyle(color: AppColors.primary, fontWeight: FontWeight.bold),
+          ),
+      iconTheme: const IconThemeData(color: AppColors.primary),
+      actions: [
+        IconButton(
+          icon: Icon(_isSearching ? Icons.close : Icons.search),
+          onPressed: () {
+            setState(() {
+              _isSearching = !_isSearching;
+              if (!_isSearching) {
+                context.read<FilterCubit>().updateSearchQuery('');
+              }
+            });
+          },
+        ),
+        IconButton(
+          icon: const Icon(Icons.filter_list),
+          onPressed: () {
+            showModalBottomSheet(
+              context: context,
+              builder: (context) => const FilterBottomSheet(),
+            );
+          },
+        ),
+      ],
     );
   }
 }
